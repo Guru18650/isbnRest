@@ -56,12 +56,20 @@ app.get('/books/publisher/:publisher', async (req, res) => {
   res.json(rows);
 });
 
-app.get('/books/search/:query', async (req, res) => {
+app.get('/books/search_old/:query', async (req, res) => {
     const query = req.params.query;
     const sql = 'SELECT * FROM books WHERE ISBN LIKE ? OR Title LIKE ? OR Author LIKE ? OR Publisher LIKE ?';
     const [rows] = await pool.query(sql, [`%${query}%`, `%${query}%`, `%${query}%`,`%${query}%`]);
     res.json(rows);
   });
+
+  app.get('/books/search/:query', async (req, res) => {
+    const query = req.params.query;
+    const sql = 'SELECT * FROM books WHERE MATCH (Title, Author, Publisher) AGAINST ("'+query+'" IN NATURAL LANGUAGE MODE);';
+    const [rows] = await pool.query(sql);
+    res.json(rows);
+  });
+  
   
 
 // Start the server
