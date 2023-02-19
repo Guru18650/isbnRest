@@ -63,12 +63,12 @@ app.get('/books/search_old/:query', async (req, res) => {
     res.json(rows);
   });
 
-app.get('/books/search/:query', async (req, res) => {
-  const query = req.params.query;
-  const sql = 'SELECT * FROM books WHERE MATCH (Title, Author, Publisher) AGAINST ("'+query+'" IN NATURAL LANGUAGE MODE);';
-  const [rows] = await pool.query(sql);
-  res.json(rows);
-});
+  app.get('/books/search/:query', async (req, res) => {
+    const query = req.params.query;
+    const sql = 'SELECT * FROM books WHERE MATCH (Title, Author, Publisher) AGAINST ("'+query+'" IN NATURAL LANGUAGE MODE);';
+    const [rows] = await pool.query(sql);
+    res.json(rows);
+  });
   
 app.post('/books/add', async (req, res) => {
   const book = req.body;
