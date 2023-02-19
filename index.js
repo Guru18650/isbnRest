@@ -63,13 +63,29 @@ app.get('/books/search_old/:query', async (req, res) => {
     res.json(rows);
   });
 
-  app.get('/books/search/:query', async (req, res) => {
-    const query = req.params.query;
-    const sql = 'SELECT * FROM books WHERE MATCH (Title, Author, Publisher) AGAINST ("'+query+'" IN NATURAL LANGUAGE MODE);';
-    const [rows] = await pool.query(sql);
-    res.json(rows);
-  });
+app.get('/books/search/:query', async (req, res) => {
+  const query = req.params.query;
+  const sql = 'SELECT * FROM books WHERE MATCH (Title, Author, Publisher) AGAINST ("'+query+'" IN NATURAL LANGUAGE MODE);';
+  const [rows] = await pool.query(sql);
+  res.json(rows);
+});
   
+app.post('/books/add', async (req, res) => {
+  const book = req.body;
+  // Check if the book already exists in the database
+  const [rows] = await pool.query('SELECT * FROM books WHERE ISBN = ?', [book.ISBN]);
+  const existingBook = rows[0];
+
+  if (existingBook) {
+    // Update the existing book
+    await pool.query('UPDATE books SET Title=?, Author=?, Publisher=?, Language=?, Length=?, PublishDate=?, PhysicalFormat=?, OlKey=?, Cover=?, Owner=? WHERE ISBN = ?', [book.Title, book.Author, book.Publisher, book.Language, book.Length, book.PublishDate, book.PhysicalFormat, book.OlKey, book.Cover, book.Owner, book.ISBN]);
+    res.json({ message: 'Book updated successfully' });
+  } else {
+    // Insert a new book
+    await pool.query('INSERT INTO books (ISBN, Title, Author, Publisher, Language, Length, PublishDate, PhysicalFormat, OlKey, Cover, Owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [book.ISBN, book.Title, book.Author, book.Publisher, book.Language, book.Length, book.PublishDate, book.PhysicalFormat, book.OlKey, book.Cover, book.Owner]);
+    res.json({ message: 'Book added successfully' });
+  }
+});
   
 
 // Start the server
