@@ -2,7 +2,7 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // Create a MySQL pool
 const pool = mysql.createPool({
@@ -67,7 +67,14 @@ app.get('/books/search_old/:query', async (req, res) => {
     const query = req.params.query;
     const sql = 'SELECT * FROM books WHERE MATCH (Title, Author, Publisher) AGAINST ("'+query+'" IN NATURAL LANGUAGE MODE);';
     const [rows] = await pool.query(sql);
-    res.json(rows);
+    if(rows.length == 0) {
+      const sql = 'SELECT * FROM books WHERE ISBN LIKE ? OR Title LIKE ? OR Author LIKE ? OR Publisher LIKE ?';
+      const [rows] = await pool.query(sql, [`%${query}%`, `%${query}%`, `%${query}%`,`%${query}%`]);
+      res.json(rows);
+    } else {
+      res.json(rows);
+    }
+    
   });
   
 app.post('/books/add', async (req, res) => {
