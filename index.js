@@ -94,6 +94,28 @@ app.post('/books/add',jsonParser, async (req, res) => {
  }
 });
   
+app.get('/stats', async (req, res) => {
+  const [totalBooksCount] = await pool.query('SELECT COUNT(*) AS totalBooksCount FROM books');
+  const [totalPagesCount] = await pool.query('SELECT SUM(Length) AS totalPagesCount FROM books');
+  const [uniqueAuthorsCount] = await pool.query('SELECT COUNT(DISTINCT Author) AS uniqueAuthorsCount FROM books');
+  const [uniquePublishersCount] = await pool.query('SELECT COUNT(DISTINCT Publisher) AS uniquePublishersCount FROM books');
+  const [publisherWithMostBooks] = await pool.query('SELECT Publisher, COUNT(*) AS bookCount FROM books GROUP BY Publisher ORDER BY bookCount DESC LIMIT 1');
+  const [authorWithMostBooks] = await pool.query('SELECT Author, COUNT(*) AS bookCount FROM books GROUP BY Author ORDER BY bookCount DESC LIMIT 1');
+  const [booksPerLanguage] = await pool.query('SELECT Language, COUNT(*) AS bookCount FROM books GROUP BY Language');
+
+  const statistics = {
+    totalBooksCount: totalBooksCount[0].totalBooksCount,
+    totalPagesCount: totalPagesCount[0].totalPagesCount,
+    uniqueAuthorsCount: uniqueAuthorsCount[0].uniqueAuthorsCount,
+    uniquePublishersCount: uniquePublishersCount[0].uniquePublishersCount,
+    publisherWithMostBooks: publisherWithMostBooks[0],
+    authorWithMostBooks: authorWithMostBooks[0],
+    booksPerLanguage: booksPerLanguage
+  };
+
+  res.json(statistics);
+});
+
 
 // Start the server
 app.listen(port, () => {
