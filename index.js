@@ -7,10 +7,10 @@ const port = 3001;
 
 // Create a MySQL pool
 const pool = mysql.createPool({
-  host: '45.138.26.6',
-  user: 'root',
-  password: '1234',
-  database: 'isbn_db',
+  host: 'bk2vpw6ahz5g7ocajb10-mysql.services.clever-cloud.com',
+  user: 'u7l6smhxaixes8sj',
+  password: 'JJ42b2OBQtgTsn2ANtnU',
+  database: 'bk2vpw6ahz5g7ocajb10',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
