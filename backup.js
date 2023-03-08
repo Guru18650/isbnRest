@@ -1,12 +1,12 @@
-import schedule from "node-schedule";
-import mysqldump from "mysqldump";
+schedule = require("node-schedule")
+mysqldump = require("mysqldump")
 require("dotenv").config();
-
 schedule.scheduleJob("0 0 * * *", () => {
   backup();
 });
 
 function backup() {
+  var d = new Date().getTime();
   mysqldump({
     connection: {
       host: process.env.DB_HOST,
@@ -14,6 +14,7 @@ function backup() {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
     },
-    dumpToFile: "./dump.sql",
+    dumpToFile: "C:/dumps/dump"+d+".sql",
   });
 }
+

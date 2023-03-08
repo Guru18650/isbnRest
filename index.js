@@ -4,6 +4,7 @@ const mysql = require("mysql2/promise");
 var jsonParser = bodyParser.json();
 const app = express();
 const port = 3001;
+require("dotenv").config();
 
 // Create a MySQL pool
 const pool = mysql.createPool({
